@@ -1,3 +1,9 @@
+RegisterNetEvent("esx:playerLoaded")
+AddEventHandler("esx:playerLoaded", function(xPlayer) ESX.PlayerData = xPlayer end)
+
+RegisterNetEvent("esx:setJob")
+AddEventHandler("esx:setJob", function(job) ESX.PlayerData.job = job end)
+
 ---menu f6
 lib.registerContext({
     id = 'menu_autoecole',
@@ -85,7 +91,6 @@ RegisterKeyMapping("menu_autoecole", "menu_autoecole", "keyboard", "F6")
 lib.registerContext({
   id = 'action',
   title = 'MENU AUTO ECOLE',
-  onExit = function() CreateThread(PositionAutoCheck) end,
   options = {
     {
       title = '🏫attribuer code de la route',
@@ -154,39 +159,26 @@ lib.registerContext({
   }
 })
 
-function PositionAutoCheck()
-    local ms   
-    while (function()
-        ms = 1000
-        ESX.PlayerData = ESX.GetPlayerData()
-        if #(GetEntityCoords(PlayerPedId()) - Config.pose.action) <= 2 and ESX.PlayerData.job.name == Config.JobUtiliser then  
-            lib.showTextUI('[E] - auto ecole menu', {
-              position = "left-center",
-              style = {
-                  borderRadius = 0,
-                  backgroundColor = '#3fd2d5',
-                  color = 'white',
-              }
-            })
-            ms = 0 
-            if IsControlJustPressed(1,51) then
-              lib.showContext('action')
-              lib.hideTextUI()
-              return false 
-            end
-          else
-  
-        end
-    
-        if #(GetEntityCoords(PlayerPedId()) - Config.pose.action) > 2 then
-           lib.hideTextUI()
-        end
-  
-        return true 
-      end)() do 
-        Wait(ms)
+Citizen.CreateThread(function()
+  while true do
+      local Timer = 500
+      local plyPos = GetEntityCoords(PlayerPedId())
+      local dist = #(plyPos-Config.pose.action)
+      if ESX.PlayerData.job.name == Config.JobUtiliser then
+      if dist <= 10.0 then
+       Timer = 0
+       DrawMarker(2, Config.pose.action, nil, nil, nil, -90, nil, nil,0.3, 0.2, 0.15, 30, 150, 30, 222, false, true, 0, false, false, false, false)
       end
+       if dist <= 3.0 then
+          Timer = 0
+          if IsControlJustPressed(1,51) then
+            lib.showContext('action')
+          end
+       end
+      end
+  Citizen.Wait(Timer)
 end
+end)
 
 --- annonce
 RegisterNetEvent('drift:perso')
@@ -211,19 +203,7 @@ end)
   
 
 
-   
 
-function InitPositionBossMenu()
-    CreateThread(PositionAutoCheck)
-    CreateThread(PositionBossCheck)
-    CreateThread(PositionGarageCheckauto)
-    CreateThread(PositionCoffreCheck)
-  end
-  
-  
-  AddEventHandler("onClientResourceStart", function()
-      InitPositionBossMenu()
-end)
 
 ---BLIPS
 local blips = {
@@ -273,7 +253,6 @@ end)
 lib.registerContext({
   id = 'boss_menu',
   title = 'BOSS MENU',
-  onExit = function() CreateThread(PositionBossCheck) end,
   options = {
     {
       title = '🤝action menu',
@@ -297,7 +276,6 @@ lib.registerContext({
   onBack = function()
     print('Went back!')
   end,
-  onExit = function() CreateThread(PositionBossCheck) end,
   options = {
     {
       title = 'recruter',
@@ -425,38 +403,26 @@ end
 
 
 
-function PositionBossCheck()
-  local ms   
-  while (function()
-      ms = 1000
-      if #(GetEntityCoords(PlayerPedId()) - Config.pose.boss) <= 2 and ESX.PlayerData.job.name == Config.JobUtiliser then
-          lib.showTextUI('[E] - boss menu', {
-            position = "left-center",
-            style = {
-                borderRadius = 0,
-                backgroundColor = '#3fd2d5',
-                color = 'white',
-            }
-          })
-          ms = 0 
+Citizen.CreateThread(function()
+  while true do
+      local Timer = 500
+      local plyPos = GetEntityCoords(PlayerPedId())
+      local dist = #(plyPos-Config.pose.boss)
+      if ESX.PlayerData.job.name == Config.JobUtiliser and ESX.PlayerData.job.grade_name == Config.gradejobboss then
+      if dist <= 10.0 then
+       Timer = 0
+       DrawMarker(2, Config.pose.boss, nil, nil, nil, -90, nil, nil,0.3, 0.2, 0.15, 30, 150, 30, 222, false, true, 0, false, false, false, false)
+      end
+       if dist <= 3.0 then
+          Timer = 0
           if IsControlJustPressed(1,51) then
             lib.showContext('boss_menu')
-            local Tikozaal = {}
-            lib.hideTextUI()
-            return false 
           end
+       end
       end
-  
-      if #(GetEntityCoords(PlayerPedId()) - Config.pose.boss) > 2 then
-         lib.hideTextUI()
-      end
-
-      return true 
-    end)() do 
-      Wait(ms)
-  end
+  Citizen.Wait(Timer)
 end
-
+end)
 ---garage
 
 local function OpenMenu()
@@ -472,7 +438,6 @@ local function OpenMenu()
   lib.registerContext({
       id = "garage",
       title = "GARAGE AUTO ECOLE",
-      onExit = function() CreateThread(PositionGarageCheckauto) end,
       options = menu
   })
   lib.showContext('garage')
@@ -489,39 +454,27 @@ RegisterNetEvent("clientsideauto", function(data)
   checkrange(car, data)
 end)
 
-function PositionGarageCheckauto()
-  local ms   
-  while (function()
-      ms = 1000
-      ESX.PlayerData = ESX.GetPlayerData()
-      if #(GetEntityCoords(PlayerPedId()) - Config.pose.garage) <= 2 and ESX.PlayerData.job.name == Config.JobUtiliser then 
-          lib.showTextUI('[E] - garage menu', {
-            position = "left-center",
-            style = {
-                borderRadius = 0,
-                backgroundColor = '#3fd2d5',
-                color = 'white',
-            }
-          })
-          ms = 0 
+
+Citizen.CreateThread(function()
+  while true do
+      local Timer = 500
+      local plyPos = GetEntityCoords(PlayerPedId())
+      local dist = #(plyPos-Config.pose.garage)
+      if ESX.PlayerData.job.name == Config.JobUtiliser then
+      if dist <= 10.0 then
+       Timer = 0
+       DrawMarker(2, Config.pose.garage, nil, nil, nil, -90, nil, nil,0.3, 0.2, 0.15, 30, 150, 30, 222, false, true, 0, false, false, false, false)
+      end
+       if dist <= 3.0 then
+          Timer = 0
           if IsControlJustPressed(1,51) then
             OpenMenu()
-            lib.hideTextUI()
-            return false 
           end
-        else
-
+       end
       end
-  
-      if #(GetEntityCoords(PlayerPedId()) - Config.pose.garage) > 2 then
-         lib.hideTextUI()
-      end
-
-      return true 
-    end)() do 
-      Wait(ms)
-    end
+  Citizen.Wait(Timer)
 end
+end)
 
 -------rangment
 function checkrange(car, int)
@@ -545,38 +498,26 @@ end
 
 ---coffre
 
+CreateThread(function()
 
-function PositionCoffreCheck()
-  local ms
-  local seetext = true 
-  while (function()
-      ms = 1000
-      if #(GetEntityCoords(PlayerPedId()) - Config.pose.coffre) <= 2 and ESX.PlayerData.job.name == Config.JobUtiliser then 
-          if seetext then
-            lib.showTextUI('[E] - coffre menu', {
-              position = "left-center",
-              style = {
-                  borderRadius = 0,
-                  backgroundColor = '#3fd2d5',
-                  color = 'white',
-              }
-            })
-          end
-          ms = 0 
+
+  while true do 
+
+      local ped = PlayerPedId()
+      local pos = GetEntityCoords(ped)
+      local menu = Config.pose.coffre
+      local dist = #(pos - menu)
+
+      if dist <= 2 and ESX.PlayerData.job.name == Config.JobUtiliser then
+
+          DrawMarker(2, menu, nil, nil, nil, -90, nil, nil,0.3, 0.2, 0.15, 30, 150, 30, 222, false, true, 0, false, false, false, false)
+
           if IsControlJustPressed(1,51) then
-            exports.ox_inventory:openInventory('stash', {id='coffre_autoecole'})
-            seetext = false 
-            lib.hideTextUI()
+            exports.ox_inventory:openInventory('stash', {id='coffre_autoecole', owner= false, job = tabac})
           end
+      else
+          Wait(1000)
       end
-  
-      if #(GetEntityCoords(PlayerPedId()) - Config.pose.coffre) > 2 then
-         lib.hideTextUI() 
-         seetext = true 
-      end
-
-      return true 
-    end)() do 
-      Wait(ms)
-    end
-end
+      Wait(0)
+  end
+end)

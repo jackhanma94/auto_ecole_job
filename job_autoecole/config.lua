@@ -2,7 +2,7 @@ Config = {}
 
 Config.pose = {
     action = vector3(227.8134, 374.7711, 106.1141),
-    boss = vector3(227.2090, 378.4857, 106.1141),
+    boss = vector3(227.1364, 378.4686, 106.1142),
     garage = vector3(221.1907, 370.0543, 106.2688),
     spawn = vector4(208.4455, 387.4780, 107.0598, 176.6571),
     delete = vector3(183.5920, 391.8256, 108.5391),
@@ -16,7 +16,7 @@ Vehicle = {
 }
 
 Config.JobUtiliser = "autoecole"
-Config.gradejobmecano = "boss"
+Config.gradejobboss = "boss"
 Config.society = "society_autoecole"
 Config.NotificationType = "esx" -- esx -- ox -- okok
 
